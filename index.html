@@ -1,0 +1,45 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>PopChoice</title>
+    <link rel="stylesheet" href="index.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <img src="images/popcorn.png" alt="Animated popcorn with googly eyes" id="logo-img">
+      <h1 id="header-title">PopChoice</h1>
+    </header>
+
+    <main>
+      <form>
+        <div id="first-qn-container" class="qn-container">
+          <label for="favorite-movie">What's your favorite movie and why?</label>
+          <textarea name="favorite-movie" id="favorite-movie"></textarea>
+        </div>
+
+        <div id="second-qn-container" class="qn-container">
+          <label for="old-new">Are you in the mood for something new or a classic?</label>
+          <textarea name="old-new" id="old-new"></textarea>
+        </div>
+
+        <div id="third-qn-container" class="qn-container">
+          <label for="seriousness">Do you wanna have fun or do you want something serious?</label>
+          <textarea name="seriousness" id="seriousness"></textarea>
+        </div>
+
+        <button type="submit" id="submit-btn">Let's Go</button>
+      </form>
+    </main>
+    <script type="module" src="index.js"></script>
+  </body>
+</html> 
