@@ -8,9 +8,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@langchain/core": "^1.1.17",
+    "@langchain/textsplitters": "^1.0.1",
     "@supabase/supabase-js": "2.38.2",
+    "langchain": "^1.2.15",
     "openai": "4.12.3",
     "vite": "latest"
-  },
-  "devDependencies": {}
+  }
 }
