@@ -67,7 +67,16 @@ textarea {
   height: 5.4em;
 }
 
-#submit-btn {
+#reveal-movie-title {
+  text-align: center;
+  margin-bottom: 1.313em;
+}
+
+#reveal-movie-desc {
+  margin-bottom: 4.063em;
+}
+
+.primary-btn {
   color: #000C36;
   background-color: #51E08A;
   border-radius: 0.333em;
@@ -84,4 +93,8 @@ textarea {
   justify-content: start;
   height: 8em;
   gap: 0.5em;
+}
+
+.hide {
+  display: none !important;
 }

@@ -21,7 +21,12 @@
     </header>
 
     <main>
-      <form>
+      <div id="reveal-movie" class="hide">
+        <h2 id="reveal-movie-title"></h2>
+        <p id="reveal-movie-desc"></p>
+        <button id="restart-btn" class="primary-btn">Go Again</button>
+      </div>
+      <form id="question-form">
         <div id="first-qn-container" class="qn-container">
           <label for="favorite-movie">What's your favorite movie and why?</label>
           <textarea name="favorite-movie" id="favorite-movie"></textarea>
@@ -37,7 +42,7 @@
           <textarea name="seriousness" id="seriousness"></textarea>
         </div>
 
-        <button type="submit" id="submit-btn">Let's Go</button>
+        <button type="submit" id="submit-btn" class="primary-btn">Let's Go</button>
       </form>
     </main>
     <script type="module" src="index.js"></script>
