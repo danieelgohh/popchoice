@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>PopChoice</title>
+    <link rel="stylesheet" href="index.css">
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Carter+One&display=swap" rel="stylesheet">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <img src="images/popcorn.png" alt="Animated popcorn with googly eyes" id="logo-img">
+      <h1 id="header-title">PopChoice</h1>
+      <div>
+        <p id="participant-number-current" class="hide"></p>
+      </div>
+    </header>
+
+    <main>
+      <div id="reveal-movie" class="hide">
+        <h2 id="reveal-movie-title"></h2>
+        <p id="reveal-movie-desc"></p>
+        <button id="restart-btn" class="primary-btn">Go Again</button>
+      </div>
+
+      <form id="group-question-form">
+        <div id="group-first-container" class="group-qn-container">
+          <input name="participants" id="participants" placeholder="How many people?" number>
+        </div>
+
+         <div id="group-second-container" class="group-qn-container">
+          <input name="time-have" id="time-have" placeholder="How much time do you have?">
+        </div>
+
+        <button type="submit" id="intro-submit-btn" class="primary-btn">Start</button>
+      </form>
+
+      <form id="individual-details" class="hide">
+        <div id="first-qn-container" class="qn-container">
+          <label for="favorite-movie-group">What's your favorite movie and why?</label>
+          <textarea name="favorite-movie-group" id="favorite-movie-group"></textarea>
+        </div>
+
+        <div id="second-qn-container" class="choice-qn-container">
+          <div id="qn-label">
+            <p>Are you in the mood for something new or a classic?</p>
+          </div>
+          <div id="first-choice-options" class="qn-options-container">
+            <label for="new" class="choice-container">
+              <input type="radio" name="old-new-group" value="new" id="new">
+              New
+            </label>
+
+            <label for="classic" class="choice-container">
+              <input type="radio" name="old-new-group" value="classic" id="classic">
+              Classic
+            </label>
+          </div>
+        </div>
+
+        <div id="third-qn-container" class="choice-qn-container">
+          <div id="qn-label">
+            <p>What are you in the mood for?</p>
+          </div>
+          <div id="second-choice-options" class="qn-options-container">
+            <label for="fun" class="choice-container">
+              <input type="radio" name="mood-group" value="fun" id="fun">
+              Fun
+            </label>
+
+            <label for="serious" class="choice-container">
+              <input type="radio" name="mood-group" value="serious" id="serious">
+              Serious
+            </label>
+
+            <label for="inspiring" class="choice-container">
+              <input type="radio" name="mood-group" value="inspiring" id="inspiring">
+              Inspiring
+            </label>
+
+            <label for="scary" class="choice-container">
+              <input type="radio" name="mood-group" value="scary" id="scary">
+              Scary
+            </label>
+          </div>
+        </div>
+
+        <div id="last-qn-container" class="qn-container">
+          <label for="favorite-actor-group">Which famous film person would you love to be stranded on an island with and why?</label>
+          <textarea name="favorite-actor-group" id="favorite-actor-group"></textarea>
+        </div>
+
+        <button type="submit" id="main-submit-btn" class="primary-btn">Get Movie</button>
+      </form>
+    </main>
+    <script type="module" src="group.js"></script>
+  </body>
+</html> 
