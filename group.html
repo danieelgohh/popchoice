@@ -15,7 +15,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">
   </head>
   <body>
-    <header>
+    <header id="header-container">
       <img src="images/popcorn.png" alt="Animated popcorn with googly eyes" id="logo-img">
       <h1 id="header-title">PopChoice</h1>
       <div>
@@ -25,14 +25,12 @@
 
     <main>
       <div id="reveal-movie" class="hide">
-        <h2 id="reveal-movie-title"></h2>
-        <p id="reveal-movie-desc"></p>
-        <button id="restart-btn" class="primary-btn">Go Again</button>
+        <button id="reveal-btn" class="primary-btn">Go Again</button>
       </div>
 
       <form id="group-question-form">
         <div id="group-first-container" class="group-qn-container">
-          <input name="participants" id="participants" placeholder="How many people?" number>
+          <input name="participants" id="participants" placeholder="How many people?">
         </div>
 
          <div id="group-second-container" class="group-qn-container">

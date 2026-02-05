@@ -96,6 +96,17 @@ input[type="radio"] {
   height: 5.4em;
 }
 
+#reveal-movie {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#restart-btn {
+  width: 100%;
+}
+
 #reveal-movie-title {
   text-align: center;
   margin-bottom: 1.313em;
@@ -103,6 +114,10 @@ input[type="radio"] {
 
 #reveal-movie-desc {
   margin-bottom: 4.063em;
+}
+
+#reveal-btn {
+  width: 100%;
 }
 
 #group-question-form {
@@ -175,4 +190,10 @@ input[type="radio"] {
 
 .choice-container.active {
   background-color: #0037ff;
+}
+
+.reveal-movie-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }

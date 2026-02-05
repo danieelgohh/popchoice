@@ -2,19 +2,20 @@ import { openai, supabase } from './config.js';
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters"
 import moviesArr from "./content"
 
+const omdbKey = import.meta.env.VITE_OMDB_API_KEY
+
+const headerContainer = document.getElementById("header-container")
 const inputs = document.querySelectorAll("textarea")
 const moodInputs = document.querySelectorAll("input[name='mood-group']")
 const oldNewInputs = document.querySelectorAll("input[name='old-new-group']")
 const qnsForm = document.getElementById("individual-details")
 const revealMovieContainer = document.getElementById("reveal-movie")
-const revealMovieTitle = document.getElementById("reveal-movie-title")
-const revealMovieDesc = document.getElementById("reveal-movie-desc")
-const restartBtn = document.getElementById("restart-btn")
 const firstMCQ = document.getElementById("first-choice-options")
 const secondMCQ = document.getElementById("second-choice-options")
 const groupQnsForm = document.getElementById("group-question-form")
 const mainSubmitBtn = document.getElementById("main-submit-btn")
 const currentParticipant = document.getElementById("participant-number-current")
+const revealBtn = document.getElementById("reveal-btn")
 
 let participants = 0
 let duration = ""
@@ -23,7 +24,24 @@ let groupPreferences = []
 const gptMessages = [
   {
     role: "system",
-    content: `You are a movie critique and you know the best movies and recommends people about it. You are given some list of context about movies and a questions or statements about preferences these context and queries will always be separated by "|" for the query think of it as queries from different people and the context is a mixture everyone involved in the survey. Recommend the most suitable movies based on the context and queries from these users you should recommend at max 3 movies and formulate a short answer using the provided context do not include any text decorations such as bolded texts. You should include important details like date of the movie along with the title in brackets can you put in a "|" separator after the movie and dates before your description of the movie. If you are unsure and cannot find the answer in the context say "Sorry, I don't know the answer." do not make up the answer, the answer should also not be lengthy try to keep it not more than 150 words. You should separate each movie with a "*"`
+    content: `You are a professional movie critic. 
+    
+    INPUT STRUCTURE:
+    You will receive text containing two parts separated by a single pipe "|". If you see more than one Context and Query pairs that just means there were multiple users involved in this questionnaire and you need to take into consideration each of their preferences and recommend a movie to fit all users. 
+    - Part 1 (Context): A mixture of movie data/descriptions.
+    - Part 2 (Queries): User personal preferences regarding movies.
+
+    TASK:
+    Recommend up to 3 movies from the provided Context that best match the Queries.
+    
+    CONSTRAINTS:
+    - Format: Title (Date) || Short Description || SearchParameter
+    - Separator: Use a single "*" between each movie recommendation.
+    - No bolding or text decorations.
+    - Length: Under 150 words total.
+    - Accuracy: If the Context doesn't contain a relevant movie, say "Sorry, I don't know the answer." do not hallucinate.
+    - Search Parameter: Movie title converted for a search query, separate the date with a "," separator (no "search=" prefix).
+    `
   }
 ]
 
@@ -86,12 +104,12 @@ const matchEmbeddedData = async (input) => {
   return data
 }
 
-const recommendMovie = async (content, query) => {
+const recommendMovie = async (content, query, duration) => {
   gptMessages.push({
     role: "user",
-    content: `Context: ${content} Query: ${query}`
+    content: `Context: ${content}, Query: ${query}, Duration: ${duration}`
   })
-
+  console.log(duration)
   console.log(content)
   console.log(query)
 
@@ -105,6 +123,13 @@ const recommendMovie = async (content, query) => {
   console.log(response)
   
   return response.choices[0].message.content
+}
+
+const getMoviePoster = async (movieTitle) => {
+  const titleParam = movieTitle.split(", ")
+  const response = await fetch(`http://www.omdbapi.com/?t=${titleParam[0]}&y=${titleParam[1]}&apikey=${omdbKey}`)
+  const data = await response.json()
+  return data.Poster
 }
 
 inputs.forEach(input => {
@@ -177,83 +202,99 @@ qnsForm.addEventListener("submit", async (e) => {
     const response = await recommendMovie(moviesToRecommend.join(" | "),
       groupPreferences.map(pref => (
         `My favorite movie is ${pref.firstParam} and I'm in the mood for something ${pref.secondParam} and ${pref.thirdParam}. Someone famous in film I would love to be stranded on an island with is ${pref.lastParam}`
-      )).join(" | ")
+      )).join(" | "), duration
     )
-
-    // if (moviesToRecommend.length > 1) {
-    //   moviesToRecommend.forEach(async (movie, index) => {
-    //     response = await recommendMovie(movie, 
-    //       `My favorite movie is ${groupPreferences[index].firstParam} and I'm in the mood for something ${groupPreferences[index].secondParam} and ${groupPreferences[index].thirdParam}. Someone famous in film I would love to be stranded on an island with is ${groupPreferences[index].lastParam}`
-    //     )
-    //   })
-    // } else {
-    //   response = await recommendMovie(moviesToRecommend[0],
-    //     `My favorite movie is ${groupPreferences[0].firstParam} and I'm in the mood for something ${groupPreferences[0].secondParam} and ${groupPreferences[0].thirdParam}. Someone famous in film I would love to be stranded on an island with is ${groupPreferences[0].lastParam}`
-    //   )
-    // }
 
     console.log(response)
 
-    // revealMovieTitle.textContent = responseSplit[0]
-    // revealMovieDesc.textContent = responseSplit[1]
+    const responseSplit = response.split("*")
 
-    // revealMovieContainer.classList.remove("hide")
+    const revealedMovies = await Promise.all(responseSplit.map( async movie => {
+      const movieSplit = movie.split(" || ")
+      console.log(movieSplit)
+      const moviePoster = await getMoviePoster(movieSplit[2])
+      return {
+        title: movieSplit[0],
+        content: movieSplit[1],
+        search_param: movieSplit[2],
+        img: moviePoster,
+      }
+    }))
 
-    // qnsForm.classList.add("hide")
+    const revealedMoviesHTML = document.createElement("div")
+    
+    revealedMoviesHTML.innerHTML = revealedMovies.map
+    ((movie, index) => {
+      const display = index === 0
+        ? ""
+        : "hide"
+      return `
+        <div id="reveal-movie-container-${index}" class="reveal-movie-container ${display}" data="reveal-movie-container-${index}">
+          <h2 id="reveal-movie-title">${movie.title}</h2>
+          <img src="${movie.img}">
+          <p id="reveal-movie-desc">${movie.content}</p>
+        </div>
+      `
+    }).join("")
+
+    console.log(revealedMovies)
+
+    if (revealedMovies.length > 1) {
+      revealBtn.textContent = "Next Movie"
+    } else {
+      revealBtn.textContent = "Go Again"
+    }
+
+    headerContainer.classList.add("hide")
+
+    revealBtn.dataset.currentContainer = 0
+
+    revealMovieContainer.prepend(revealedMoviesHTML)
+    revealMovieContainer.classList.remove("hide")
+
+    groupQnsForm.classList.add("hide")
+    qnsForm.classList.add("hide")
+
+    currentParticipant.classList.add("hide")
   } else {
     inputs.forEach((input) => {
       input.value = ""
     })
 
     moodInputs.forEach(input => {
-      input.value = ""
+      input.checked = false
       input.parentElement.classList.remove("active")
     })
 
     oldNewInputs.forEach(input => {
-      input.value = ""
+      input.checked = false
       input.parentElement.classList.remove("active")
     })
 
     currentParticipant.textContent = String(Number(currentParticipant.textContent) + 1)
   }
-
-  // const data1 = await matchEmbeddedData(firstQn)
-  // const data2 = await matchEmbeddedData(secondQn)
-  // const data3 = await matchEmbeddedData(thirdQn)
-
-  // const data2Ids = new Set(data2.map(data => (data.id)))
-  // const data3Ids = new Set(data3.map(data => (data.id)))
-
-  // const finalizedMovies = data1.filter(data => (
-  //   data2Ids.has(data.id)
-  // )).filter(data => (
-  //   data3Ids.has(data.id)
-  // ))
-
-  // const response = await recommendMovie(finalizedMovies[0].content)
-  // const responseSplit = response.split("|")
-
-  // revealMovieTitle.textContent = responseSplit[0]
-  // revealMovieDesc.textContent = responseSplit[1]
-
-  // revealMovieContainer.classList.remove("hide")
-
-  // qnsForm.classList.add("hide")
 })
 
-mainSubmitBtn.addEventListener("click", () => {
-  return
-})
+revealBtn.addEventListener("click", (e) => {
+  const revealMovieSingleContainer = document.querySelectorAll(".reveal-movie-container")
+  if (Number(revealBtn.dataset.currentContainer) + 1 === revealMovieSingleContainer.length) {
+    revealBtn.textContent = "Go Again"
+  } else if (Number(revealBtn.dataset.currentContainer) === revealMovieSingleContainer.length) {
+    revealMovieContainer.classList.add("hide")
 
-restartBtn.addEventListener("click", () => {
-  revealMovieContainer.classList.add("hide")
+    qnsForm.classList.remove("hide")
 
-  qnsForm.classList.remove("hide")
+    inputs.forEach(input => {
+      input.value = ""
+    })
+  } else {
+    revealBtn.textContent = "Next Movie"
+    document.getElementById(`reveal-movie-container-${Number(revealBtn.dataset.currentContainer)}`).classList.add("hide")
 
-  inputs.forEach(input => {
-    input.value = ""
-  })
+    document.getElementById(`reveal-movie-container-${Number(revealBtn.dataset.currentContainer) + 1}`).classList.remove("hide")
+
+    revealBtn.dataset.currentContainer = String(Number(revealBtn.dataset.currentContainer) + 1)
+  }
 })
 
 // moviesArr.forEach(movie => embedStoreData(movie))
