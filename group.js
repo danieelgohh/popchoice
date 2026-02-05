@@ -16,6 +16,8 @@ const groupQnsForm = document.getElementById("group-question-form")
 const mainSubmitBtn = document.getElementById("main-submit-btn")
 const currentParticipant = document.getElementById("participant-number-current")
 const revealBtn = document.getElementById("reveal-btn")
+const participantsInput = document.getElementById("participants")
+const durationInput = document.getElementById("time-have")
 
 let participants = 0
 let duration = ""
@@ -55,7 +57,7 @@ const splitDescription = async (description) => {
     })
 
     const output = await splitter.createDocuments([description])
-    console.log(output)
+
     return output
   } catch (err) {
     console.error(err.message)
@@ -109,9 +111,6 @@ const recommendMovie = async (content, query, duration) => {
     role: "user",
     content: `Context: ${content}, Query: ${query}, Duration: ${duration}`
   })
-  console.log(duration)
-  console.log(content)
-  console.log(query)
 
   const response = await openai.chat.completions.create({
     model: "gpt-5.2",
@@ -119,8 +118,6 @@ const recommendMovie = async (content, query, duration) => {
     temperature: 0.5,
     frequency_penalty: 0.5
   })
-
-  console.log(response)
   
   return response.choices[0].message.content
 }
@@ -183,7 +180,6 @@ qnsForm.addEventListener("submit", async (e) => {
   groupPreferences.push(formDetails)
 
   if (Number(currentParticipant.textContent) === participants) {
-    mainSubmitBtn.textContent = "Get Movie"
     const movies = groupPreferences.map( async (pref) => {
       const firstQuery = await matchEmbeddedData(pref.firstParam)
       const secondQuery = await matchEmbeddedData(pref.secondParam + pref.thirdParam)
@@ -205,13 +201,10 @@ qnsForm.addEventListener("submit", async (e) => {
       )).join(" | "), duration
     )
 
-    console.log(response)
-
     const responseSplit = response.split("*")
 
     const revealedMovies = await Promise.all(responseSplit.map( async movie => {
       const movieSplit = movie.split(" || ")
-      console.log(movieSplit)
       const moviePoster = await getMoviePoster(movieSplit[2])
       return {
         title: movieSplit[0],
@@ -236,8 +229,6 @@ qnsForm.addEventListener("submit", async (e) => {
         </div>
       `
     }).join("")
-
-    console.log(revealedMovies)
 
     if (revealedMovies.length > 1) {
       revealBtn.textContent = "Next Movie"
@@ -272,36 +263,52 @@ qnsForm.addEventListener("submit", async (e) => {
     })
 
     currentParticipant.textContent = String(Number(currentParticipant.textContent) + 1)
+
+    if (Number(currentParticipant.textContent) === participants) {
+      mainSubmitBtn.textContent = "Get Movie"
+    }
   }
 })
 
 revealBtn.addEventListener("click", (e) => {
   const revealMovieSingleContainer = document.querySelectorAll(".reveal-movie-container")
-  if (Number(revealBtn.dataset.currentContainer) + 1 === revealMovieSingleContainer.length) {
-    revealBtn.textContent = "Go Again"
-  } else if (Number(revealBtn.dataset.currentContainer) === revealMovieSingleContainer.length) {
+  
+  if (Number(revealBtn.dataset.currentContainer) === revealMovieSingleContainer.length - 1) {
     revealMovieContainer.classList.add("hide")
 
-    qnsForm.classList.remove("hide")
+    groupQnsForm.classList.remove("hide")
 
     inputs.forEach(input => {
       input.value = ""
     })
+
+    moodInputs.forEach(input => {
+      input.checked = false
+      input.parentElement.classList.remove("active")
+    })
+
+    oldNewInputs.forEach(input => {
+      input.checked = false
+      input.parentElement.classList.remove("active")
+    })
+
+    participantsInput.value = ""
+    durationInput.value = ""
+
+    headerContainer.classList.remove("hide")
   } else {
     revealBtn.textContent = "Next Movie"
     document.getElementById(`reveal-movie-container-${Number(revealBtn.dataset.currentContainer)}`).classList.add("hide")
 
     document.getElementById(`reveal-movie-container-${Number(revealBtn.dataset.currentContainer) + 1}`).classList.remove("hide")
 
-    revealBtn.dataset.currentContainer = String(Number(revealBtn.dataset.currentContainer) + 1)
+    revealBtn.dataset.currentContainer = Number(revealBtn.dataset.currentContainer) + 1
+
+    if (Number(revealBtn.dataset.currentContainer) === revealMovieSingleContainer.length - 1) {
+    revealBtn.textContent = "Go Again"
+  } 
   }
 })
 
+// Store movie data in vector database
 // moviesArr.forEach(movie => embedStoreData(movie))
-
-// batman because it is very story rich and the characters are interesting it is also loaded with action
-// timothee chalamet because he is like so non chalant and i can learn french
-
-// the avengers endgame because it is just so story rich and so unexpected it is just so exciting throughout the whole movie
-
-// leonardo dicaprio probably because his acting is just so good and i would just spend time listening to him talking about his acting
